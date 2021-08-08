@@ -22,8 +22,15 @@ impl Device {
 
   pub fn bound_to_instance() -> Option<String> {
     match env::var(EDGE_CONNECTOR_BINDING_ENV_NAME) {
-        Ok(host) => Some(host),
+        Ok(instance) => Some(instance),
         Err(_) => None,
+    }
+  }
+
+  pub fn set_instance_binding(instance: Option<&String>) {
+    match instance {
+      Some(i) => env::set_var(EDGE_CONNECTOR_BINDING_ENV_NAME, i),
+      None => env::remove_var(EDGE_CONNECTOR_BINDING_ENV_NAME)
     }
   }
 }

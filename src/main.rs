@@ -3,10 +3,11 @@ use std::str;
 use sysinfo::{System, SystemExt};
 
 use edge_connector::*;
+use edge_connector::device::Device;
 
 fn main() -> std::io::Result<()> {
   let sys = System::new_all();
-  let device = device::Device::new(sys);
+  let device = Device::new(sys);
 
   let client = reqwest::blocking::Client::new();
   let socket = UdpSocket::bind(EDGE_CONNECTOR_UDP_SOCKET_BINDING)?;
@@ -20,22 +21,28 @@ fn main() -> std::io::Result<()> {
     println!("{}", msg);
 
     if src.is_ipv6() {
-      continue;
+      continue
     }
+    let src_ip = src.ip().to_string();
 
-    if msg.starts_with("apollo-available") && device::Device::bound_to_instance().is_some() {
-      let res = client.post(format!("{}:5888", src.ip().to_string()))
+    if msg.starts_with("apollo-available") && Device::bound_to_instance().is_none() {
+      let res = client.post(format!("{}:5888", src_ip))
         .json(&serde_json::to_string(&device).unwrap())
         .send()
         .expect("no response received");
 
       match res.status() {
-        reqwest::StatusCode::OK => println!("Ok!"),
+        reqwest::StatusCode::OK => {
+          Device::set_instance_binding(Some(&src_ip));
+          println!("Bound to instance {}", src_ip);
+        },
         s => println!("Received response status: {:?}", s)
       }
 
     } else if msg.starts_with("apollo-release") {
-
+      if let Some(_) = Device::bound_to_instance() {
+        Device::set_instance_binding(None)
+      }
     }
   }
 }
