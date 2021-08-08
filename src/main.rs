@@ -1,6 +1,5 @@
 use std::net::UdpSocket;
 use std::str;
-use std::collections::HashMap;
 use sysinfo::{System, SystemExt};
 
 use edge_connector::*;
@@ -25,12 +24,8 @@ fn main() -> std::io::Result<()> {
     }
 
     if msg.starts_with("apollo-available") && device::Device::bound_to_instance().is_some() {
-      let mut body = HashMap::new();
-      body.insert("type", "faasd");
-      body.insert("arch", &device.arch);
-
       let res = client.post(format!("{}:5888", src.ip().to_string()))
-        .json(&body)
+        .json(&serde_json::to_string(&device).unwrap())
         .send()
         .expect("no response received");
 
