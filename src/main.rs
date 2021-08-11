@@ -1,13 +1,12 @@
 use std::net::UdpSocket;
 use std::str;
-use sysinfo::{System, SystemExt};
+use std::collections::HashMap;
 
 use edge_connector::*;
 use edge_connector::device::Device;
 
 fn main() -> std::io::Result<()> {
-  let sys = System::new_all();
-  let device = Device::new(sys);
+  let device = Device::default();
 
   let client = reqwest::blocking::Client::new();
   let socket = UdpSocket::bind(EDGE_CONNECTOR_UDP_SOCKET_BINDING)?;
@@ -25,9 +24,13 @@ fn main() -> std::io::Result<()> {
     }
     let src_ip = src.ip().to_string();
 
-    if msg.starts_with("apollo-available") && Device::bound_to_instance().is_none() {
-      let res = client.post(format!("{}:5888", src_ip))
-        .json(&serde_json::to_string(&device).unwrap())
+    if msg.starts_with("apollo-available") && Device::get_instance_binding().is_none() {
+      let mut body = HashMap::new();
+      body.insert("device", serde_json::to_string(&device)?);
+      body.insert("key", get_faasd_auth_key()?);
+
+      let res = client.post(format!("http://{}:5888/register/", src_ip))
+        .json(&body)
         .send()
         .expect("no response received");
 
@@ -40,7 +43,7 @@ fn main() -> std::io::Result<()> {
       }
 
     } else if msg.starts_with("apollo-release") {
-      if let Some(_) = Device::bound_to_instance() {
+      if let Some(_) = Device::get_instance_binding() {
         Device::set_instance_binding(None)
       }
     }

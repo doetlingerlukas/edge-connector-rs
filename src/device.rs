@@ -4,7 +4,7 @@ use serde::Serialize;
 
 pub const EDGE_CONNECTOR_BINDING_ENV_NAME: &'static str = "DEVICE_BOUND_TO";
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Default, Serialize)]
 pub struct Device {
   pub arch: String,
   pub num_cores: usize,
@@ -12,7 +12,9 @@ pub struct Device {
 }
 
 impl Device {
-  pub fn new(sys: System) -> Device {
+  pub fn default() -> Device {
+    let sys = System::new_all();
+
     Self {
       arch: env::consts::ARCH.to_string(),
       num_cores: sys.processors().len(),
@@ -20,7 +22,7 @@ impl Device {
     }
   }
 
-  pub fn bound_to_instance() -> Option<String> {
+  pub fn get_instance_binding() -> Option<String> {
     match env::var(EDGE_CONNECTOR_BINDING_ENV_NAME) {
         Ok(instance) => Some(instance),
         Err(_) => None,
