@@ -2,7 +2,7 @@ use std::env;
 use sysinfo::{System, SystemExt};
 use serde::Serialize;
 
-pub const EDGE_CONNECTOR_BINDING_ENV_NAME: &'static str = "DEVICE_BOUND_TO";
+const EDGE_CONNECTOR_BINDING_ENV_NAME: &'static str = "DEVICE_BOUND_TO";
 
 #[derive(Debug, Default, Serialize)]
 pub struct Device {
