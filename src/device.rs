@@ -5,6 +5,7 @@ use serde::Serialize;
 const EDGE_CONNECTOR_BINDING_ENV_NAME: &'static str = "DEVICE_BOUND_TO";
 
 #[derive(Debug, Default, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Device {
   pub arch: String,
   pub name: String,
