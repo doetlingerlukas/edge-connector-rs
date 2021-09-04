@@ -25,13 +25,13 @@ fn main() -> std::io::Result<()> {
 
     if msg.starts_with(&Message::ApolloAvailable.to_string()) {
       if let Some(instance) = Device::get_instance_binding() {
-        if instance.eq(&src_ip) {
+        if !instance.eq(&src_ip) {
           continue
         }
       }
 
       let res = client.post(format!("http://{}:5888/register/", src_ip))
-        .json(&serde_json::to_string(&device)?)
+        .json(&device)
         .send()
         .expect("no response received");
 
