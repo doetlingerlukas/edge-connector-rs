@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'open3'
+
 TARGET = ENV['TARGET'] || 'arm-unknown-linux-gnueabihf'
 
 RPI = ENV['RPI'] || 'edge-device.local'
