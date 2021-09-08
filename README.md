@@ -24,7 +24,7 @@ Make sure to have `ssh` access to the Raspberry Pi. If you are not using a certi
 The `run` task will fetch the access key for faasd and compile the binary from it. It also automatically deploys the binary and runs it on the device. To execute the task, insert your Pi's address and run the following command:
 
 ```bash
-RPI="<IP or DNS name>"; rake run
+RPI="<IP or DNS name>" rake run
 ```
 
 ## Compile on device
