@@ -1,6 +1,8 @@
 use std::str;
 
 pub mod device;
+pub mod benchmark;
+pub mod faasd;
 
 pub static FAASD_AUTH_KEY: &'static str = include_str!("../faas-key");
 
