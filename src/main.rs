@@ -3,6 +3,8 @@ use std::str;
 
 use edge_connector::*;
 use edge_connector::device::Device;
+use edge_connector::faasd::FaasdHost;
+use edge_connector::benchmark::BenchmarkRun;
 
 fn main() -> std::io::Result<()> {
   let device = Device::default();
@@ -49,4 +51,8 @@ fn main() -> std::io::Result<()> {
       }
     }
   }
+  let faasd_host = FaasdHost::default();
+
+  let benchmark = BenchmarkRun::create(&faasd_host);
+  let _benchmark_time = benchmark.run();
 }

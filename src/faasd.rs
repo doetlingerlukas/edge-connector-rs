@@ -31,14 +31,29 @@ impl FaasdHost {
       .basic_auth("admin", Some(self.auth.clone()))
       .json(&map)
       .send() {
-        Ok(res) => {
-          if res.status().is_success() {
+        Ok(resp) => {
+          if resp.status().is_success() {
             println!("Function {} deployed successfully.", &function);
           } else {
-            println!("Error deploying function, status is {}.", res.status());
+            println!("Error deploying function, status is {}.", resp.status());
           }
         },
-        Err(_) => panic!(),
+        Err(_) => panic!()
     }
+  }
+
+  pub fn invoke(&self, service_name: String, input: String) {
+    match self.client.post(format!("http://{}:{}/function/{}", self.host, self.port, &service_name))
+      .body(input)
+      .send() {
+        Ok(resp) => {
+          if resp.status().is_success() {
+            println!("Function {} returned: {}", &service_name, resp.text().unwrap_or(String::new()));
+          } else {
+            println!("Error invoking function, status is {}.", resp.status());
+          }
+        },
+        Err(_) => panic!()
+      }
   }
 }
