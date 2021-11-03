@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 use reqwest::blocking::Client;
+use serde::{Deserialize, Serialize};
 
 use crate::FAASD_AUTH_KEY;
 
@@ -56,4 +57,39 @@ impl FaasdHost {
         Err(_) => panic!()
       }
   }
+
+  pub fn clear_functions(&self) {
+    let functions = match self.client.get(format!("http://{}:{}/system/functions", self.host, self.port))
+      .basic_auth("admin", Some(self.auth.clone()))
+      .send() {
+        Ok(resp) => {
+          if resp.status().is_success() {
+            let json: Vec<FunctionResponse> = resp.json().expect("Couldn't get response as JSON.");
+            json
+          } else {
+            panic!("Error getting deployed functions.");
+          }
+        },
+        Err(_) => panic!()
+      };
+
+    for f in functions.iter() {
+      match self.client.delete(format!("http://{}:{}/system/functions", self.host, self.port))
+        .basic_auth("admin", Some(self.auth.clone()))
+        .json(&f)
+        .send() {
+          Ok(resp) => {
+            println!("Trying to delete function {} returned status {} ", &f.function_name, resp.status());
+          },
+          Err(_) => panic!()
+        }
+    }
+  }
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct FunctionResponse {
+  #[serde(alias = "name")]
+  function_name: String
 }

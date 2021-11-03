@@ -9,6 +9,14 @@ use edge_connector::benchmark::BenchmarkRun;
 fn main() -> std::io::Result<()> {
   let device = Device::default();
 
+  let faasd_host = FaasdHost::default();
+  faasd_host.clear_functions();
+
+  let benchmark = BenchmarkRun::create(&faasd_host);
+  let benchmark_time = benchmark.run();
+
+  println!("Benchmark run took {} seconds.", benchmark_time.as_secs());
+
   let client = reqwest::blocking::Client::new();
   let socket = UdpSocket::bind(EDGE_CONNECTOR_UDP_SOCKET_BINDING)?;
 
@@ -51,8 +59,4 @@ fn main() -> std::io::Result<()> {
       }
     }
   }
-  let faasd_host = FaasdHost::default();
-
-  let benchmark = BenchmarkRun::create(&faasd_host);
-  let _benchmark_time = benchmark.run();
 }
