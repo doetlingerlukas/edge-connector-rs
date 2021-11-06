@@ -2,16 +2,19 @@ use std::env;
 use sysinfo::{System, SystemExt};
 use serde::Serialize;
 
+use crate::benchmark::BenchmarkResult;
+
 const EDGE_CONNECTOR_BINDING_ENV_NAME: &'static str = "DEVICE_BOUND_TO";
 
 #[derive(Debug, Default, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Device {
-  pub arch: String,
-  pub name: String,
-  pub num_cores: usize,
-  pub ram_size: u64,
-  pub key: String
+  arch: String,
+  name: String,
+  num_cores: usize,
+  ram_size: u64,
+  key: String,
+  pub benchmark_result: Option<BenchmarkResult>
 }
 
 impl Device {
@@ -23,7 +26,8 @@ impl Device {
       name: sys.name().unwrap_or(String::new()),
       num_cores: sys.processors().len(),
       ram_size: sys.total_memory() / 1000,
-      key: crate::FAASD_AUTH_KEY.to_string()
+      key: crate::FAASD_AUTH_KEY.to_string(),
+      benchmark_result: None
     }
   }
 

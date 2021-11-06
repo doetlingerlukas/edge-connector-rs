@@ -1,11 +1,19 @@
 use std::collections::HashMap;
 use std::time::{Duration, Instant};
 
+use serde::Serialize;
+
 use crate::faasd::FaasdHost;
 
 pub struct BenchmarkRun<'b> {
   faasd_host: &'b FaasdHost,
   functions: HashMap<String, String>
+}
+
+#[derive(Debug, Default, Serialize)]
+pub struct BenchmarkResult {
+  deployment: Duration,
+  invocations: Duration
 }
 
 impl<'b> BenchmarkRun<'b> {
@@ -24,14 +32,17 @@ impl<'b> BenchmarkRun<'b> {
     }
   }
 
-  pub fn run(&'b self) -> Duration {
+  pub fn run(&'b self) -> BenchmarkResult {
     self.faasd_host.clear_functions();
 
-    let start = Instant::now();
+    let mut start = Instant::now();
 
     for (function, service) in self.functions.iter() {
       self.faasd_host.deploy(function.clone(), service.clone());
     }
+
+    let deployment = start.elapsed();
+    start = Instant::now();
 
     // TODO: make this more nice
     self.faasd_host.invoke(String::from("doetlingerlukas-addition"),
@@ -39,6 +50,9 @@ impl<'b> BenchmarkRun<'b> {
     self.faasd_host.invoke(String::from("doetlingerlukas-monte-carlo-pi-function"),
       String::from("{\"samples\":100000,\"wait\":1}"));
 
-    start.elapsed()
+    BenchmarkResult {
+      deployment,
+      invocations: start.elapsed()
+    }
   }
 }
