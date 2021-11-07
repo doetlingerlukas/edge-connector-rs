@@ -23,7 +23,7 @@ impl Device {
 
     Self {
       arch: env::consts::ARCH.to_string(),
-      name: sys.name().unwrap_or(String::new()),
+      name: sys.host_name().unwrap_or(String::new()),
       num_cores: sys.processors().len(),
       ram_size: sys.total_memory() / 1000,
       key: crate::FAASD_AUTH_KEY.to_string(),
