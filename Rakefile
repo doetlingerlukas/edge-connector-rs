@@ -26,7 +26,11 @@ task :build => :update_key do
 end
 
 task :deploy => :build do
-  sh 'rsync', '-z', '--rsync-path', 'sudo rsync', "target/#{TARGET}/release/edge-connector", "#{HOST}:/usr/local/bin/edge-connector"
+  sh 'scp', "target/#{TARGET}/release/edge-connector", "#{HOST}:~/edge-connector"
+  ssh <<~SH
+    sudo mv ./edge-connector /usr/local/bin/edge-connector
+    sudo chmod 755 /usr/local/bin/edge-connector
+  SH
 end
 
 task :run => :deploy do
