@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-use std::time::{Duration, Instant};
+use std::time::Instant;
 
 use serde::Serialize;
 
@@ -12,8 +12,8 @@ pub struct BenchmarkRun<'b> {
 
 #[derive(Debug, Default, Serialize)]
 pub struct BenchmarkResult {
-  deployment: Duration,
-  invocations: Duration
+  deployment: u128,
+  invocations: u128
 }
 
 impl<'b> BenchmarkRun<'b> {
@@ -51,8 +51,8 @@ impl<'b> BenchmarkRun<'b> {
       String::from("{\"samples\":100000,\"wait\":1}"));
 
     BenchmarkResult {
-      deployment,
-      invocations: start.elapsed()
+      deployment: deployment.as_nanos(),
+      invocations: start.elapsed().as_nanos()
     }
   }
 }
