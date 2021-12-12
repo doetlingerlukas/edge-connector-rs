@@ -20,6 +20,11 @@ task :update_key do
   File.write 'faas-key', out
 end
 
+desc 'connect faas-cli to host'
+task :login do
+  sh 'faas-cli', 'login', '-u', 'admin', '-s', '--gateway', "http://#{RPI}:8080", :in=>'faas-key'
+end
+
 desc 'compile binary'
 task :build => :update_key do
   sh 'cross', 'build', '--release', '--target', TARGET
