@@ -3,7 +3,7 @@ use std::time::Instant;
 
 use serde::Serialize;
 
-use crate::faasd::FaasdHost;
+use crate::faasd::{FaasdHost, FunctionResponse};
 
 pub struct BenchmarkRun<'b> {
   faasd_host: &'b FaasdHost,
@@ -33,7 +33,9 @@ impl<'b> BenchmarkRun<'b> {
   }
 
   pub fn run(&'b self) -> BenchmarkResult {
-    self.faasd_host.clear_functions();
+    for (_, service) in self.functions.iter() {
+      self.faasd_host.clear_function(&FunctionResponse::new(service));
+    }
 
     let mut start = Instant::now();
 

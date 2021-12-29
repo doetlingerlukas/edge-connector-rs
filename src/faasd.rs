@@ -74,22 +74,34 @@ impl FaasdHost {
       };
 
     for f in functions.iter() {
-      match self.client.delete(format!("http://{}:{}/system/functions", self.host, self.port))
-        .basic_auth("admin", Some(self.auth.clone()))
-        .json(&f)
-        .send() {
-          Ok(resp) => {
-            println!("Trying to delete function {} returned status {} ", &f.function_name, resp.status());
-          },
-          Err(_) => panic!()
-        }
+      self.clear_function(f);
     }
+  }
+
+  pub fn clear_function(&self, f: &FunctionResponse) {
+    match self.client.delete(format!("http://{}:{}/system/functions", self.host, self.port))
+      .basic_auth("admin", Some(self.auth.clone()))
+      .json(&f)
+      .send() {
+        Ok(resp) => {
+          println!("Trying to delete function {} returned status {} ", &f.function_name, resp.status());
+        },
+        Err(_) => panic!()
+      }
   }
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
-struct FunctionResponse {
+pub struct FunctionResponse {
   #[serde(alias = "name")]
   function_name: String
+}
+
+impl FunctionResponse {
+  pub fn new(name: &str) -> Self {
+    Self {
+      function_name: name.to_string()
+    }
+  }
 }
