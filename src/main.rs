@@ -12,7 +12,6 @@ fn main() -> std::io::Result<()> {
   let mut device = Device::default();
 
   let faasd_host = FaasdHost::default();
-  faasd_host.clear_functions();
 
   println!("Running benchmark ...");
 
